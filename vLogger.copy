@@ -1,0 +1,18 @@
+import { Logger } from "../utils/Logger"
+
+const searchParams = (url: string, param: string): string => {
+
+  let all_params = url.includes('?') ? url.split('?')[1] : "?anithing";
+  console.log('url', url, 'allParams', all_params, 'params', param)
+  let finds_one_param = all_params.includes(param) ? all_params.split(`${param}=`)[1] : ''
+  return finds_one_param !== "" ? finds_one_param : ""
+}
+
+export async function vLoggerService(ctx: Context, next: () => Promise<any>) {
+  const URL = ctx.request.url;
+  let fileName = searchParams(String(URL), 'from')
+  const vLogger = new Logger("Logger", fileName)
+  var logs = await vLogger.stream().then((res) => { return res }).catch(() => { return "No se encontro el archivo" })
+  ctx.body = logs
+  await next()
+}
